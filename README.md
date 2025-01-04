@@ -58,7 +58,9 @@ fig: relations existantes entre les differentes classes
 
 NB: *Ces diagrammes peuvent etre détaillés davantage en fonction des besoins.*
 
-
+## Copyright ©️
+- [sdley Souleymane DIALLO](https://sdley.github.io/) 2025
+- UAM, Polytech Diamniadio
 
   
 
