@@ -1,17 +1,27 @@
 package sn.sdley.queueManagementSystem.model;
 
-// Client.java
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+@Entity
 public class Client extends Personne {
     private String ticket;
     private int positionDansFile;
     private int nombreDeVant;
     private String adresse;
 
-    public Client(String prenom, String nom, String ticket, int positionDansFile,
+    // Relation inverse entre Client et FileAttente
+    @ManyToOne
+    @JoinColumn(name = "fileAttente_id")
+    private FileAttente fileAttente;
+
+    public Client() {
+    }
+
+    public Client(Personne personne, String ticket, int positionDansFile,
                   int nombreDeVant, String adresse) {
-//        super(prenom, nom);
-        this.prenom = prenom;
-        this.nom = nom;
+
         this.ticket = ticket;
         this.positionDansFile = positionDansFile;
         this.nombreDeVant = nombreDeVant;
@@ -20,4 +30,36 @@ public class Client extends Personne {
 
     // Getters, setters, constructeurs, méthodes
 
+
+    public String getTicket() {
+        return ticket;
+    }
+
+    public void setTicket(String ticket) {
+        this.ticket = ticket;
+    }
+
+    public int getPositionDansFile() {
+        return positionDansFile;
+    }
+
+    public void setPositionDansFile(int positionDansFile) {
+        this.positionDansFile = positionDansFile;
+    }
+
+    public int getNombreDeVant() {
+        return nombreDeVant;
+    }
+
+    public void setNombreDeVant(int nombreDeVant) {
+        this.nombreDeVant = nombreDeVant;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
 }

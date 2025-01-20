@@ -10,6 +10,8 @@
     <ul>
         <li><a href="/service/1">Orange</a></li>
         <li><a href="/service/2">Senelec</a></li>
+        <li><a href="/service/3">Bank</a></li>
+
         <!-- Afficher la liste des services -->
     </ul>
 </body>
