@@ -7,26 +7,91 @@ import jakarta.persistence.*;
 public class Ticket {
 
     /*
-        Cette classe correspond en realite a la classe Client
-        Mais pourvu qu'un client ne peut avoir qu'un seul ticket a la fois
-        et ne peut etre dans qu'une seule file d'attente a la fois,
-        Nous avons estime qu'il n'est pas necessaire de conserver cette classe
+        En realite un client peut avoir plusieurs tickets!
      */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int number;
-    private int position;
-    private int peopleAhead;
-    private String status;
+    private String nomService; // nom du ticket
+    private int numero; // numero du ticket
+    private int positionDansFile;
+    private int nombreDeVant;
+    private String statusTicket;
 
-//    @ManyToOne
-//    private Service service;
 
-//    @ManyToOne
-//    private Location location;
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client client;
+
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public void setNumero(int numero) {
+        this.numero = numero;
+    }
+
+    public Ticket() {
+    }
+
+    public Ticket(String nomService, int positionDansFile, int nombreDeVant, String statusTicket) {
+        this.nomService = nomService;
+        this.positionDansFile = positionDansFile;
+        this.nombreDeVant = nombreDeVant;
+        this.statusTicket = statusTicket;
+    }
 
     // Getters and Setters
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNomService() {
+        return nomService;
+    }
+
+    public void setNomService(String nomService) {
+        this.nomService = nomService;
+    }
+
+    public int getPositionDansFile() {
+        return positionDansFile;
+    }
+
+    public void setPositionDansFile(int positionDansFile) {
+        this.positionDansFile = positionDansFile;
+    }
+
+    public int getNombreDeVant() {
+        return nombreDeVant;
+    }
+
+    public void setNombreDeVant(int nombreDeVant) {
+        this.nombreDeVant = nombreDeVant;
+    }
+
+    public String getStatusTicket() {
+        return statusTicket;
+    }
+
+    public void setStatusTicket(String statusTicket) {
+        this.statusTicket = statusTicket;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
 }
 

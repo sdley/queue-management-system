@@ -21,6 +21,11 @@ public class ServiceService {
         return serviceRepository.findById(id).orElse(null);
     }
 
+    // get service by name
+    public sn.sdley.queueManagementSystem.model.Service getServiceByName(String name) {
+        return serviceRepository.findByNom(name);
+    }
+
     public sn.sdley.queueManagementSystem.model.Service createService(sn.sdley.queueManagementSystem.model.Service service) {
         return serviceRepository.save(service);
     }
@@ -33,6 +38,10 @@ public class ServiceService {
             return serviceRepository.save(service);
         }
         return null;
+    }
+
+    public void deleteService(Long id) {
+        serviceRepository.deleteById(id);
     }
 
 

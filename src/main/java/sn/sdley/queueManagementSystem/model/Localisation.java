@@ -8,17 +8,31 @@ public class Localisation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String nom;
+    private String nom; // nom de la localisation
+
 
     @ManyToOne
-    @JoinColumn(name = "service_id")
+    @JoinColumn(name = "nom_service") // nom du service nom_service ou service_id
     private Service service;
 
     public Localisation() {
     }
 
+    public Localisation(String nom, Service service) {
+        this.nom = nom;
+        this.service = service;
+    }
+
     // Getters, setters, constructeurs
 
+
+    public Service getService() {
+        return service;
+    }
+
+    public void setService(Service service) {
+        this.service = service;
+    }
 
     public int getId() {
         return id;

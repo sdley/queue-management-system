@@ -21,8 +21,18 @@ public class LocalisationService {
         return localisationRepository.findById(id).orElse(null);
     }
 
+    // get localisation by name
+    public Localisation getLocalisationByName(String name) {
+        return localisationRepository.findByNom(name);
+    }
+
     public Localisation createLocalisation(Localisation localisation) {
         return localisationRepository.save(localisation);
+    }
+
+    // return localisations of a specific service name
+    public List<Localisation> getLocalisationsByService(sn.sdley.queueManagementSystem.model.Service service) {
+        return localisationRepository.findByService(service);
     }
 
     public Localisation updateLocalisation(Long id, Localisation localisationDetails) {

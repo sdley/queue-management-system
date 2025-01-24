@@ -5,4 +5,5 @@ import sn.sdley.queueManagementSystem.model.Service;
 
 public interface ServiceRepository extends JpaRepository<Service, Long> {
 
+    Service findByNom(String name);
 }

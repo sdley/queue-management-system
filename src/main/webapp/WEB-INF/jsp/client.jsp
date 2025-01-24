@@ -1,60 +1,74 @@
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Client</title>
 </head>
 <body>
-    <h1>Liste des Clients</h1>
-    <table id="clientsTable">
+    <h1>Selectionnez un Service et une Localisation</h1>
+    <form action="/client/choixService" method="post">
+        <label for="serviceSelect">Service:</label>
+        <select id="serviceSelect" name="serviceId" onchange="this.form.submit()">
+            <option value="">Selectionnez un Service</option>
+            <c:forEach var="service" items="${services}">
+                <option value="${service.nom}" ${service.nom == selectedService ? 'selected' : ''}>
+                        ${service.nom}</option>
+            </c:forEach>
+        </select>
+
+        <label for="locationSelect">Localisation:</label>
+        <select id="locationSelect" name="localisationId">
+            <option value="">Selectionnez une localisation</option>
+            <c:if test="${not empty localisations}">
+                <c:forEach var="localisation" items="${localisations}">
+                    <option value="${localisation.nom}">${localisation.nom}</option>
+                </c:forEach>
+            </c:if>
+        </select>
+
+<%--        <p>--%>
+<%--            <input type="submit" value="Generer un Ticket"/>--%>
+<%--        </p>--%>
+    </form>
+
+    <%--    Generation de ticket--%>
+    <form action="/ticket/genererTicket" method="post">
+        <input type="hidden" name="serviceId" value="${selectedService}"/>
+        <!-- Nous devons ajuster cela selon notre logique -->
+        <input type="hidden" name="localisationId" value="${locationSelect}"/><br>
+        <label for="clientId">Selectionnez un Client:</label>
+        <select id="clientId" name="clientId">
+            <option value="">Selectionnez un Client</option>
+            <c:forEach var="client" items="${clients}">
+                <option value="${client.id}">${client.prenom} ${client.nom}</option>
+            </c:forEach>
+        </select>
+        <p>
+            <input type="submit" value="Generer un Ticket"/>
+        </p>
+    </form>
+
+
+    <%--    Liste des clents--%>
+    <h3>Liste des Clients</h3>
+    <table>
         <tr>
             <th>ID</th>
             <th>Nom</th>
             <th>Actions</th>
         </tr>
-<%--        <c:forEach var="client" items="${clients}">--%>
-<%--            <tr>--%>
-<%--                <td>${client.id}</td>--%>
-<%--                <td>${client.nom}</td>--%>
-<%--                <td>--%>
-<%--                    <a href="/client/edit/${client.id}">Edit</a>--%>
-<%--                    <a href="/client/delete/${client.id}">Delete</a>--%>
-<%--                </td>--%>
-<%--            </tr>--%>
-<%--        </c:forEach>--%>
-
-<%--        JS --%>
-        <script type="text/javascript">
-            // Récupération de la chaîne JSON passée par le modèle
-            var clientsJson = '${clients}';
-
-            // Convertir la chaîne JSON en objet JavaScript
-            var clients = JSON.parse(clientsJson);
-
-            // Afficher les données dans la console pour vérification
-            // console.log(admins);
-
-            // Exemple d'affichage des données dans le DOM
-            window.onload = function() {
-                var table = document.getElementById("clientsTable");
-                clients.forEach(function(client) {
-                    var row = table.insertRow();
-                    var cellId = row.insertCell(0);
-                    var cellPrenom = row.insertCell(1);
-                    var cellNom = row.insertCell(2);
-                    var cellActions = row.insertCell(3); // Nouvelle cellule pour les actions
-                    cellId.innerHTML = client.id;
-                    cellNom.innerHTML = client.nom;
-                    cellPrenom.innerHTML = client.prenom;
-                    // Ajout des liens Edit et Delete
-                    cellActions.innerHTML = `
-                    <a href="/client/edit/${client.id}">Edit</a> |
+        <c:forEach var="client" items="${clients}">
+            <tr>
+                <td>${client.id}</td>
+                <td>${client.prenom} ${client.nom}</td>
+                <td>
+                    <a href="/client/edit/${client.id}">Edit</a>
                     <a href="/client/delete/${client.id}">Delete</a>
-                    `;
-                });
-            };
-        </script>
+                </td>
+            </tr>
+        </c:forEach>
     </table>
+
     <a href="/client/add">Ajouter un Client</a>
     <p>
         <a href="/">Retour à l'accueil</a>

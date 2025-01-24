@@ -5,41 +5,56 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-public class FileAttente extends Personne {
+@Table(name = "file_attente")
+public class FileAttente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String service;
+
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private Service service;
 
     @OneToMany(mappedBy = "fileAttente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Client> clients;
 
-//  A revoir
+    //  A revoir
+    /*
+        ERROR 17864 --- [queueManagementSystem] [           main]
+        j.LocalContainerEntityManagerFactoryBean : Failed to initialize JPA
+        EntityManagerFactory: Collection
+        'sn.sdley.queueManagementSystem.model.Admin.listeFileAttente' is 'mappedBy'
+        a property named 'admin' which does not exist in the target entity
+        'sn.sdley.queueManagementSystem.model.FileAttente'
+     */
     @ManyToOne
     private Admin admin;
 
     public FileAttente() {
     }
 
+    public FileAttente(Service service, List<Client> clients) {
+        this.service = service;
+        this.clients = clients;
+    }
 
     // Getters, setters, constructeurs, méthodes
 
-    @Override
+
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
-    public String getService() {
+    public Service getService() {
         return service;
     }
 
-    public void setService(String service) {
+    public void setService(Service service) {
         this.service = service;
     }
 
@@ -49,13 +64,5 @@ public class FileAttente extends Personne {
 
     public void setClients(List<Client> clients) {
         this.clients = clients;
-    }
-
-    public Admin getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
     }
 }

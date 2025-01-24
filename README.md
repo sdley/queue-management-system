@@ -53,7 +53,7 @@ Representons les interactions ou relations existantes entre ces differentes clas
 - Une FileAttente est associée à un seul Service mais peut contenir plusieurs Clients.
 - Un Agent peut traiter des clients dans une file d'attente.
 - Un Admin peut voir toutes les files d'attente en cours.
-![image](https://github.com/user-attachments/assets/9d8659aa-70fb-4049-887e-ceb4ce84fdad)
+![conception-image-diagram](img.png)
 fig: relations existantes entre les differentes classes
 
 NB: *Ces diagrammes peuvent etre détaillés davantage en fonction des besoins.*

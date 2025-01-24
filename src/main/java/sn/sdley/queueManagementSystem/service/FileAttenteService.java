@@ -26,10 +26,15 @@ public class FileAttenteService {
         return fileAttenteRepository.save(fileAttente);
     }
 
+    // Find file d'attente by service id
+    public FileAttente getFileAttenteByServiceName(String serviceName) {
+        return fileAttenteRepository.findByServiceNom(serviceName);
+    }
+
     public FileAttente updateFileAttente(Long id, FileAttente fileAttenteDetails) {
         FileAttente fileAttente = getFileAttenteById(id);
         if (fileAttente != null){
-            fileAttente.setNom(fileAttenteDetails.getNom());
+//            fileAttente.setNom(fileAttenteDetails.getNom());
             fileAttente.setClients(fileAttenteDetails.getClients());
             return fileAttenteRepository.save(fileAttente);
         }

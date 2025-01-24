@@ -8,9 +8,9 @@ import java.util.List;
 public class Service {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(unique = true, nullable = false)
     private String nom;
+    private String description;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Localisation> localisations;
@@ -18,15 +18,19 @@ public class Service {
     public Service() {
     }
 
-    // Getters, setters, constructeurs, méthodes
-
-
-    public int getId() {
-        return id;
+    public Service(String nom, String description) {
+        this.nom = nom;
+        this.description = description;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    // Getters, setters, constructeurs, méthodes
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getNom() {
