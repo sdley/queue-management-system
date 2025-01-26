@@ -8,6 +8,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Erreur</title>
     <link rel="stylesheet" href="<c:url value='/css/error.css' />"> <!-- Optional CSS -->
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </head>
 <body>
 <div class="container">
@@ -18,6 +23,10 @@
     <p>
         Veuillez verifier bien les informations saisies et reessayer !
     </p>
+    <p>
+        <button onclick="goBack()">Retourner a la page precedente</button> <!-- Bouton pour revenir en arrière -->
+    </p>
+
     <a href="<c:url value='/' />">Retourner a la page d'accueil</a>
 </div>
 </body>

@@ -24,6 +24,17 @@ public class Ticket {
     @JoinColumn(name = "client_id")
     private Client client;
 
+    @ManyToOne
+    @JoinColumn(name = "service_id") // nom_service est le nom de la colonne dans la table ticket
+    private Service service;
+
+    public Service getService() {
+        return service;
+    }
+
+    public void setService(Service service) {
+        this.service = service;
+    }
 
     public int getNumero() {
         return numero;

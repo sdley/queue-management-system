@@ -71,7 +71,7 @@
 
     <a href="/client/add">Ajouter un Client</a>
     <p>
-        <a href="/">Retour à l'accueil</a>
+        <a href="/">Retour A l'accueil</a>
     </p>
 </body>
 </html>

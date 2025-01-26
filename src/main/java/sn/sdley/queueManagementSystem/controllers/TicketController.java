@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sn.sdley.queueManagementSystem.model.*;
 import sn.sdley.queueManagementSystem.service.*;
 
@@ -32,25 +33,34 @@ public class TicketController {
     private FileAttenteService fileAttenteService;
 
     // Méthodes pour gérer les tickets
-    @GetMapping
-    public String listTickets(Model model) {
-        // Récupérer la liste des tickets
-        model.addAttribute("tickets", ticketService.getAllTickets());
-        return "ticket";
+    @GetMapping("/ticketDetails")
+    public String getTicketDetails(@RequestParam("ticketId") Long ticketId, Model model) {
+        Ticket ticket = ticketService.getTicketById(ticketId);
+
+        // System.out.println("\nTicket ID: " + ticketId + "\n");
+
+        if (ticket == null) {
+            model.addAttribute("error", "Ticket introuvable.");
+            return "error";
+        }
+
+        model.addAttribute("ticket", ticket);
+        return "ticketDetails";
     }
 
     // Generation de Ticket
     @PostMapping("/genererTicket")
     public String genererTicket(@RequestParam String serviceId,
                                 @RequestParam Long clientId,
-                                @RequestParam String localisation,
-                                Model model) {
+                                @RequestParam String localisationId,
+                                RedirectAttributes redirectAttributes) {
         // Récupérer le service
-        Service service = serviceService.getServiceByName(serviceId); // Assurez-vous que cette méthode existe
+        Service service = serviceService.getServiceByName(serviceId);
 
         if (service == null) {
-            model.addAttribute("error", "Service introuvable.");
-            return "error"; // Rediriger vers une page d'erreur
+            redirectAttributes.addFlashAttribute("error",
+                    "Service introuvable.");
+            return "redirect:/error";
         }
 
         // Récupérer la file d'attente pour le service
@@ -61,17 +71,17 @@ public class TicketController {
             fileAttente = new FileAttente();
             fileAttente.setService(service);
             fileAttente.setClients(new ArrayList<>()); // Initialiser la liste des clients
-            fileAttenteService.createFileAttente(fileAttente); // Méthode à créer dans FileAttenteService
+            fileAttenteService.createFileAttente(fileAttente);
         }
 
         // Calculer la position dans la file et le nombre de personnes devant
-        int positionDansFile = fileAttente.getClients().size() + 1; // Position dynamique
-        int nombreDeVant = fileAttente.getClients().size(); // Nombre de personnes devant
+        int positionDansFile = fileAttente.getClients().size() + 1;
+        int nombreDeVant = fileAttente.getClients().size();
 
         // Créer un nouveau ticket
         Ticket ticket = new Ticket();
         ticket.setNomService(service.getNom());
-        ticket.setNumero(generateTicketNumber()); // Générer un numéro de ticket unique
+        ticket.setNumero(generateTicketNumber());
         ticket.setPositionDansFile(positionDansFile);
         ticket.setNombreDeVant(nombreDeVant);
         ticket.setStatusTicket("En attente");
@@ -79,78 +89,42 @@ public class TicketController {
         // Associer le client au ticket
         Client client = clientService.getClientById(clientId);
         if (client == null) {
-            model.addAttribute("error", "Client introuvable.");
-            return "error"; // Rediriger vers une page d'erreur
+            redirectAttributes.addFlashAttribute("error",
+                    "Client introuvable.");
+            return "redirect:/error";
         }
         ticket.setClient(client);
 
-//        // Ajouter le ticket à la file d'attente
-//        fileAttente.getClients().add(client); // Ajouter le client à la file d'attente
-//        fileAttenteService.updateFileAttente(fileAttente); // Méthode à créer pour mettre à jour la file d'attente
-
         // Ajouter le ticket à la file d'attente
-        fileAttente.getClients().add(client); // Ajouter le client à la file d'attente
-
-        // Update the fileAttente with the new clients list
-        fileAttenteService.updateFileAttente(fileAttente.getId(), fileAttente); // Pass the ID and updated object
+        fileAttente.getClients().add(client);
+        fileAttenteService.updateFileAttente(fileAttente.getId(), fileAttente);
 
         // Enregistrer le ticket
         ticketService.createTicket(ticket);
 
-        // Ajouter le ticket à la vue pour confirmation ou redirection
-        model.addAttribute("ticket", ticket);
-        model.addAttribute("localisation", localisation); // Ajouter la localisation au modèle
-        return "confirmation"; // Rediriger vers une page de confirmation
+        // Rediriger vers la page des détails du ticket
+        redirectAttributes.addAttribute("ticketId", ticket.getId());
+        return "redirect:/ticket/ticketDetails";
     }
 
     // Méthode pour générer un numéro de ticket unique
     private int generateTicketNumber() {
         // Logique pour générer un numéro unique, par exemple, en incrémentant le dernier numéro
-        return (int) (Math.random() * 10000); // Remplacez par votre logique réelle
+        return (int) (Math.random() * 10000); // obtenir un nombre aléatoire entre 0 et 9999
+
+        /*
+            Unique : Le commentaire dans le code suggère que la logique réelle devrait
+            garantir que le numéro de ticket soit unique. La méthode actuelle ne garantit pas cela,
+            car elle peut générer le même numéro plusieurs fois.
+
+            Amélioration possible : Pour assurer l'unicité, il serait préférable d'utiliser
+            une approche comme l'incrémentation d'un compteur ou l'utilisation d'une base de données
+            pour suivre les numéros de ticket déjà générés.
+         */
     }
 
 
-    //@PostMapping("/genererTicket")
-//public String genererTicket(@RequestParam String serviceId,
-//                            @RequestParam String localisationId,
-//                            @RequestParam Long clientId,
-//                            Model model) {
-//    // Récupérer le service et la localisation
-//    Service service = serviceService.getServiceByName(serviceId);
-//    Localisation localisation = localisationService.getLocalisationByName(localisationId);
-//    Client client = clientService.getClientById(clientId); // Récupérer le client par ID
-//
-//    if (service == null || localisation == null || client == null) {
-//        model.addAttribute("error", "Service, Localisation ou Client introuvable.");
-//        return "error"; // Rediriger vers une page d'erreur si l'un des éléments est introuvable
-//    }
-//
-//    // Logique pour générer un numéro de ticket
-//    int numeroTicket = generateTicketNumber(); // Méthode à définir pour générer un numéro unique
-//
-//    // Créer un nouveau ticket
-//    Ticket ticket = new Ticket();
-//    ticket.setNomService(service.getNom());
-//    ticket.setNumero(numeroTicket);
-//    ticket.setPositionDansFile(1); // Par exemple, position initiale
-//    ticket.setNombreDeVant(0); // Initialiser à 0 ou selon votre logique
-//    ticket.setStatusTicket("En attente"); // Statut initial
-//    ticket.setClient(client); // Associer le client au ticket
-//
-//    // Enregistrer le ticket
-//    ticketService.createTicket(ticket);
-//
-//    // Ajouter le ticket à la vue pour confirmation ou redirection
-//    model.addAttribute("ticket", ticket);
-//    return "confirmation"; // Rediriger vers une page de confirmation
-//}
-//
-//    // Méthode pour générer un numéro de ticket unique
-//    private int generateTicketNumber() {
-//        // Logique pour générer un numéro unique, par exemple, en incrémentant le dernier numéro
-//        // Vous pouvez également utiliser un service pour obtenir le dernier numéro de ticket
-//        return (int) (Math.random() * 10000); // Remplacez par votre logique réelle
-//    }
+
 
 
 }
