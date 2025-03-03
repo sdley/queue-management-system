@@ -32,6 +32,8 @@
         <li><a href="/client">Client</a></li>
         <li><a href="/agent">Agent</a></li>
         <li><a href="/admin">Admin</a></li>
+        <li><a href="/services">Services</a></li>
+
     </ul>
 </body>
 </html>

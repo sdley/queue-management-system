@@ -30,14 +30,14 @@ public class TicketService {
         Ticket ticket = getTicketById(id);
         if (ticket != null){
             ticket.setNumero(ticketDetails.getNumero());
-            ticket.setNomService(ticketDetails.getNomService());
             ticket.setPositionDansFile(ticketDetails.getPositionDansFile());
-            ticket.setNombreDeVant(ticketDetails.getNombreDeVant());
-            ticket.setStatusTicket(ticketDetails.getStatusTicket());
+            ticket.setNombreDevant(ticketDetails.getNombreDevant());
+            ticket.setStatus(ticketDetails.getStatus());
+            ticket.setService(ticketDetails.getService());
             ticket.setClient(ticketDetails.getClient());
             return ticketRepository.save(ticket);
         }
-        return ticketRepository.save(ticket);
+        return null;
     }
 
     public void deleteTicket(Long id) {

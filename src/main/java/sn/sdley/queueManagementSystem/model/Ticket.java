@@ -13,11 +13,11 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nomService; // nom du ticket
+    // private String nomService; // nom du ticket
     private int numero; // numero du ticket
     private int positionDansFile;
-    private int nombreDeVant;
-    private String statusTicket;
+    private int nombreDevant;
+    private String status;
 
 
     @ManyToOne
@@ -25,7 +25,7 @@ public class Ticket {
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "service_id") // nom_service est le nom de la colonne dans la table ticket
+    @JoinColumn(name = "nomService") // nom_service est le nom de la colonne dans la table ticket
     private Service service;
 
     public Service getService() {
@@ -47,30 +47,19 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(String nomService, int positionDansFile, int nombreDeVant, String statusTicket) {
-        this.nomService = nomService;
+    public Ticket(int positionDansFile, int nombreDevant, String statusTicket) {
         this.positionDansFile = positionDansFile;
-        this.nombreDeVant = nombreDeVant;
-        this.statusTicket = statusTicket;
+        this.nombreDevant = nombreDevant;
+        this.status = statusTicket;
     }
 
     // Getters and Setters
-
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getNomService() {
-        return nomService;
-    }
-
-    public void setNomService(String nomService) {
-        this.nomService = nomService;
     }
 
     public int getPositionDansFile() {
@@ -81,20 +70,20 @@ public class Ticket {
         this.positionDansFile = positionDansFile;
     }
 
-    public int getNombreDeVant() {
-        return nombreDeVant;
+    public int getNombreDevant() {
+        return nombreDevant;
     }
 
-    public void setNombreDeVant(int nombreDeVant) {
-        this.nombreDeVant = nombreDeVant;
+    public void setNombreDevant(int nombreDevant) {
+        this.nombreDevant = nombreDevant;
     }
 
-    public String getStatusTicket() {
-        return statusTicket;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStatusTicket(String statusTicket) {
-        this.statusTicket = statusTicket;
+    public void setStatus(String statusTicket) {
+        this.status = statusTicket;
     }
 
     public Client getClient() {

@@ -29,9 +29,6 @@ public class ClientService {
     public Client updateClient(Long id, Client clientDetails) {
         Client client = getClientById(id);
         if (client != null){
-            client.setTicket(clientDetails.getTicket());
-            client.setPositionDansFile(clientDetails.getPositionDansFile());
-            client.setNombreDeVant(clientDetails.getNombreDeVant());
             client.setAdresse(clientDetails.getAdresse());
             return clientRepository.save(client);
         }

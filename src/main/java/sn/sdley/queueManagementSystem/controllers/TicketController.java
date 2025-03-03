@@ -37,8 +37,6 @@ public class TicketController {
     public String getTicketDetails(@RequestParam("ticketId") Long ticketId, Model model) {
         Ticket ticket = ticketService.getTicketById(ticketId);
 
-        // System.out.println("\nTicket ID: " + ticketId + "\n");
-
         if (ticket == null) {
             model.addAttribute("error", "Ticket introuvable.");
             return "error";
@@ -66,25 +64,38 @@ public class TicketController {
         // Récupérer la file d'attente pour le service
         FileAttente fileAttente = fileAttenteService.getFileAttenteByServiceName(service.getNom());
 
+        // Generer un nouveau ticket
+        Ticket ticket = new Ticket();
+
+        int positionDansFile;
+        int nombreDevant;
+
         // Si aucune file d'attente n'existe, en créer une
         if (fileAttente == null) {
             fileAttente = new FileAttente();
             fileAttente.setService(service);
             fileAttente.setClients(new ArrayList<>()); // Initialiser la liste des clients
             fileAttenteService.createFileAttente(fileAttente);
+
+            // Calculer la position dans la file et le nombre de personnes devant
+            positionDansFile = 1;
+            nombreDevant = 0;
+        }else{
+            // Calculer la position dans la file et le nombre de personnes devant
+            positionDansFile = fileAttente.getClients().toArray().length + 1;
+            nombreDevant = fileAttente.getClients().toArray().length;
+            System.out.println("\nfileAttente.getClients() " +
+                    fileAttente.getClients() + "\n\n");
+            System.out.println("\nfileAttente.getClients().size() " +
+                    fileAttente.getClients().size() + "\n\n");
         }
 
-        // Calculer la position dans la file et le nombre de personnes devant
-        int positionDansFile = fileAttente.getClients().size() + 1;
-        int nombreDeVant = fileAttente.getClients().size();
-
-        // Créer un nouveau ticket
-        Ticket ticket = new Ticket();
-        ticket.setNomService(service.getNom());
+        // Completer les details du ticket
         ticket.setNumero(generateTicketNumber());
         ticket.setPositionDansFile(positionDansFile);
-        ticket.setNombreDeVant(nombreDeVant);
-        ticket.setStatusTicket("En attente");
+        ticket.setNombreDevant(nombreDevant);
+        ticket.setService(service);
+        ticket.setStatus("En attente");
 
         // Associer le client au ticket
         Client client = clientService.getClientById(clientId);
@@ -95,7 +106,7 @@ public class TicketController {
         }
         ticket.setClient(client);
 
-        // Ajouter le ticket à la file d'attente
+        // Ajouter le client à la file d'attente
         fileAttente.getClients().add(client);
         fileAttenteService.updateFileAttente(fileAttente.getId(), fileAttente);
 
@@ -112,15 +123,6 @@ public class TicketController {
         // Logique pour générer un numéro unique, par exemple, en incrémentant le dernier numéro
         return (int) (Math.random() * 10000); // obtenir un nombre aléatoire entre 0 et 9999
 
-        /*
-            Unique : Le commentaire dans le code suggère que la logique réelle devrait
-            garantir que le numéro de ticket soit unique. La méthode actuelle ne garantit pas cela,
-            car elle peut générer le même numéro plusieurs fois.
-
-            Amélioration possible : Pour assurer l'unicité, il serait préférable d'utiliser
-            une approche comme l'incrémentation d'un compteur ou l'utilisation d'une base de données
-            pour suivre les numéros de ticket déjà générés.
-         */
     }
 
 
