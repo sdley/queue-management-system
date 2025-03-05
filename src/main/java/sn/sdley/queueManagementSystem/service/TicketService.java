@@ -60,4 +60,12 @@ public class TicketService {
         */
     }
 
+    // Methode pour gerer la generation de tickets avec la politique que nous avons definie
+    public Integer getLastTicketNumberByService(String serviceName) {
+        return ticketRepository.findLastTicketByService(serviceName)
+                .map(ticket -> Integer.parseInt(ticket.getNumero().substring(3)))
+                .orElse(100);
+    }
+
+
 }

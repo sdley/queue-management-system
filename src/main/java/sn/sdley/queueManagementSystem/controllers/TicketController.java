@@ -10,11 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sn.sdley.queueManagementSystem.model.*;
 import sn.sdley.queueManagementSystem.service.*;
-
 import java.util.ArrayList;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/ticket")
@@ -37,9 +33,6 @@ public class TicketController {
 
     // Constantes pour la génération de tickets
     private static final int START_NUMBER = 100;
-    // serviceCounters est une Map<String, Integer> qui stocke le dernier
-    // numéro attribué pour chaque service.
-    private Map<String, Integer> serviceCounters = new HashMap<>();
 
     // Méthodes pour gérer les tickets
     @GetMapping("/ticketDetails")
@@ -124,21 +117,28 @@ public class TicketController {
 
 
     // Méthode pour générer un numéro de ticket unique
+    /**
+     * Definition d'une politique de génération de numéro de ticket:
+     * 1. Génère un préfixe basé sur les trois premières lettres du service en majuscules.
+     * 2. Assure un compteur unique par service en commençant à 101.
+     * 3. Stocke les compteurs des services dans une Map<String, Integer>
+     *     pour suivre le dernier numéro attribué.
+     * Cela garantit que chaque service a son propre séquencement cohérent des tickets.
+     * Par exemple, le premier client du service Sonatel obtiendra le ticket SON101.
+     */
     private String generateTicketNumber(String serviceName) {
-        /**
-         * Definition d'une politique de génération de numéro de ticket:
-         * 1. Génère un préfixe basé sur les trois premières lettres du service en majuscules.
-         * 2. Assure un compteur unique par service en commençant à 101.
-         * 3. Stocke les compteurs des services dans une Map<String, Integer>
-         *     pour suivre le dernier numéro attribué.
-         * Cela garantit que chaque service a son propre séquencement cohérent des tickets.
-         * Par exemple, le premier client du service Sonatel obtiendra le ticket SON101.
-         */
+        // Extraire les trois premières lettres du service en majuscules
         String servicePrefix = serviceName.substring(0, Math.min(3, serviceName.length())).toUpperCase();
-        int lastNumber = serviceCounters.getOrDefault(servicePrefix, START_NUMBER);
-        int newTicketNumber = lastNumber + 1;
-        serviceCounters.put(servicePrefix, newTicketNumber);
+
+        // Récupérer le dernier ticket attribué pour ce service en base de données
+        Integer lastNumber = ticketService.getLastTicketNumberByService(serviceName);
+
+        // Si aucun ticket n'existe encore pour ce service, on commence à START_NUMBER (100)
+        int newTicketNumber = (lastNumber != null) ? lastNumber + 1 : START_NUMBER;
+
+        // Retourner le ticket formaté
         return servicePrefix + newTicketNumber;
     }
+
 
 }
