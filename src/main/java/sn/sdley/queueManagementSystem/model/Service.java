@@ -15,6 +15,11 @@ public class Service {
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Localisation> localisations;
 
+    /**
+     * L'annotation orphanRemoval = true dans une relation JPA (Java Persistence API)
+     * spécifie que si un élément (dans ce cas, un objet Ticket) est retiré de la collection
+     * (ici, List<Ticket> tickets), il doit être supprimé de la base de données automatiquement.
+     */
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets;
 

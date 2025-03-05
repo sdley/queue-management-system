@@ -17,14 +17,25 @@
         </select>
 
         <label for="locationSelect">Localisation:</label>
-        <select id="locationSelect" name="localisationId">
+        <select id="locationSelect" name="localisationId"
+                onchange="updateHiddenLocalisation(this.value)">
             <option value="">Selectionnez une localisation</option>
             <c:if test="${not empty localisations}">
                 <c:forEach var="localisation" items="${localisations}">
-                    <option value="${localisation.nom}">${localisation.nom}</option>
+                    <option
+                            value="${localisation.nom}"
+                            ${localisation.nom == selectedLocalisation ? 'selected' : ''}>
+                            ${localisation.nom}
+                    </option>
                 </c:forEach>
             </c:if>
         </select>
+
+        <script>
+            function updateHiddenLocalisation(value) {
+                document.getElementById("hiddenNomLocalisation").value = value;
+            }
+        </script>
 
 <%--        <p>--%>
 <%--            <input type="submit" value="Generer un Ticket"/>--%>
@@ -33,9 +44,9 @@
 
     <%--    Generation de ticket--%>
     <form action="/ticket/genererTicket" method="post">
-        <input type="hidden" name="serviceId" value="${selectedService}"/>
+        <input type="hidden" name="nomService" value="${selectedService}"/>
         <!-- Nous devons ajuster cela selon notre logique -->
-        <input type="hidden" name="localisationId" value="${locationSelect}"/><br>
+        <input type="hidden" id="hiddenNomLocalisation" name="nomLocalisation" value="${selectedLocalisation}"/><br>
         <label for="clientId">Selectionnez un Client:</label>
         <select id="clientId" name="clientId">
             <option value="">Selectionnez un Client</option>

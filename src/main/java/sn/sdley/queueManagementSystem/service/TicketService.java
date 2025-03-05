@@ -44,7 +44,20 @@ public class TicketService {
         ticketRepository.deleteById(id);
     }
 
+    // Find clients `file attente` by service name
+    public List<Ticket> getFileAttenteClientsByServiceName(String serviceName) {
+        return ticketRepository.findClientsByServiceNom(serviceName);
+    }
 
-
+    // Find tickets by service name and localisation name
+    public List<Ticket> getTicketsByServiceNameAndLocalisationName(String serviceName,
+                                                                   String localisationName) {
+        return ticketRepository.findByService_NomAndService_Localisations_Nom(serviceName,
+                localisationName);
+        /**
+        * return ticketRepository.findByServiceAndLocalisation(serviceName,
+                localisationName);
+        */
+    }
 
 }

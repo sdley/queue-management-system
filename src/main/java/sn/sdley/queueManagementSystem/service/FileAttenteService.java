@@ -31,6 +31,11 @@ public class FileAttenteService {
         return fileAttenteRepository.findByServiceNom(serviceName);
     }
 
+    // Find `file attente` clients by service id
+//    public List<Client> getFileAttenteClientsByServiceName(String serviceName) {
+//        return fileAttenteRepository.findByServiceNom(serviceName).getClients();
+//    }
+
     public FileAttente updateFileAttente(Long id, FileAttente fileAttenteDetails) {
         FileAttente fileAttente = getFileAttenteById(id);
         if (fileAttente != null){
