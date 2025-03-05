@@ -52,7 +52,7 @@ public class TicketService {
     // Find tickets by service name and localisation name
     public List<Ticket> getTicketsByServiceNameAndLocalisationName(String serviceName,
                                                                    String localisationName) {
-        return ticketRepository.findByService_NomAndService_Localisations_Nom(serviceName,
+        return ticketRepository.findByServiceNomAndLocalisation(serviceName,
                 localisationName);
         /**
         * return ticketRepository.findByServiceAndLocalisation(serviceName,

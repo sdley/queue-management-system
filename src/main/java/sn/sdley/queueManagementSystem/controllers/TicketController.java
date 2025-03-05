@@ -121,6 +121,7 @@ public class TicketController {
         ticket.setNombreDevant(nombreDevant);
         ticket.setService(service);
         ticket.setStatus("En attente");
+        ticket.setLocalisation(nomLocalisation);
 
         // Retrieve the client
         Client client = clientService.getClientById(clientId);

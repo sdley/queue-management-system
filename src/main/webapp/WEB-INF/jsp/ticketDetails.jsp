@@ -15,7 +15,7 @@
     <h1>Ticket Genere</h1>
     <p><strong>ID du Ticket:</strong> ${ticket.id}</p>
     <p><strong>Service:</strong> ${ticket.service.nom}</p>
-<%--    <p><strong>Localisation:</strong> ${ticket.localisation.nom}</p>--%>
+    <p><strong>Localisation:</strong> ${ticket.localisation}</p>
     <p><strong>Client:</strong> ${ticket.client.prenom} ${ticket.client.nom}</p>
 
     <p>

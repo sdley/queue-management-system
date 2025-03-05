@@ -18,7 +18,7 @@ public class Ticket {
     private int positionDansFile;
     private int nombreDevant;
     private String status;
-
+    private String localisation;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
@@ -27,6 +27,27 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "nomService") // nom_service est le nom de la colonne dans la table ticket
     private Service service;
+
+    public Ticket() {
+    }
+
+    public Ticket(int positionDansFile, int nombreDevant,
+                  String statusTicket, String localisation) {
+        this.positionDansFile = positionDansFile;
+        this.nombreDevant = nombreDevant;
+        this.status = statusTicket;
+        this.localisation = localisation;
+    }
+
+    // Getters and Setters
+
+    public String getLocalisation() {
+        return localisation;
+    }
+
+    public void setLocalisation(String localisation) {
+        this.localisation = localisation;
+    }
 
     public Service getService() {
         return service;
@@ -44,16 +65,6 @@ public class Ticket {
         this.numero = numero;
     }
 
-    public Ticket() {
-    }
-
-    public Ticket(int positionDansFile, int nombreDevant, String statusTicket) {
-        this.positionDansFile = positionDansFile;
-        this.nombreDevant = nombreDevant;
-        this.status = statusTicket;
-    }
-
-    // Getters and Setters
     public Long getId() {
         return id;
     }

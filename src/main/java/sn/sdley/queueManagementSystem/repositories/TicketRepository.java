@@ -6,13 +6,21 @@ import sn.sdley.queueManagementSystem.model.Ticket;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
-    // Récupérer la liste des clients ayant pris un ticket pour un service donné
+    /** Récupérer la liste des clients ayant pris un ticket pour un service donné
+     * findClientsByService_Nom : Service_Nom et ServiceNom sont identiques
+     * Ils se traduits par Service.Nom correspondant à la colonne nom dans la table Service
+     * @param nomService
+     * @return
+     */
     List<Ticket> findClientsByServiceNom(String nomService);
 
-    // Récupérer la liste des tickets pour un service et une localisation
-    List<Ticket> findByService_NomAndService_Localisations_Nom(String nomService,
-                                                               String nomLocalisation);
+    List<Ticket> findByServiceNomAndLocalisation(String nomService, String localisation);
+
+
     /**
+     * // Récupérer la liste des tickets pour un service et une localisation
+     *     List<Ticket> findByService_NomAndService_Localisations_Nom(String nomService,
+     *                                                                String nomLocalisation);
      * Service_Localisations est une liste, donc il peut y avoir plusieurs localisations pour un service.
      * Spring Data JPA ne sait pas comment filtrer une seule localisation correctement dans une liste.
      * Utilisation d'une requête JPQL pour faire une jointure correcte entre Ticket, Service et Localisation.
