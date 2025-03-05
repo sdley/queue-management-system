@@ -12,6 +12,9 @@ import sn.sdley.queueManagementSystem.model.*;
 import sn.sdley.queueManagementSystem.service.*;
 
 import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/ticket")
@@ -31,6 +34,12 @@ public class TicketController {
 
     @Autowired
     private FileAttenteService fileAttenteService;
+
+    // Constantes pour la génération de tickets
+    private static final int START_NUMBER = 100;
+    // serviceCounters est une Map<String, Integer> qui stocke le dernier
+    // numéro attribué pour chaque service.
+    private Map<String, Integer> serviceCounters = new HashMap<>();
 
     // Méthodes pour gérer les tickets
     @GetMapping("/ticketDetails")
@@ -60,8 +69,6 @@ public class TicketController {
             return "error";
         }
 
-        System.out.println("\n\nLocalisation selectionnee : " + nomLocalisation);
-
         if (nomLocalisation == null || nomLocalisation.trim().isEmpty()) {
             model.addAttribute("error",
                     "Veuillez sélectionner une localisation");
@@ -78,23 +85,6 @@ public class TicketController {
             fileAttente = fileAttenteService.createFileAttente(fileAttente); // Persist it
         }
 
-        // Calculate position in the queue correctly
-        /**
-         * 1. Calculer la position dans la file d'attente
-         * 2. Calculer le nombre de personnes devant
-         * 3. Créer un nouveau ticket
-         */
-
-        // Nombre total de clients du service
-        int nbreTotalServiceClients = ticketService
-                .getFileAttenteClientsByServiceName(nomService).size();
-
-        // Clients du Service pour une localisation donnée v1
-//        int positionDansFile = ticketService
-//                .getFileAttenteClientsByServiceName(nomService).size() + 1;
-//        int nombreDevant = ticketService
-//                .getFileAttenteClientsByServiceName(nomService).size();
-
         // Clients du Service pour une localisation donnée v2
         int positionDansFile = ticketService
                 .getTicketsByServiceNameAndLocalisationName(nomService,
@@ -103,20 +93,9 @@ public class TicketController {
                 .getTicketsByServiceNameAndLocalisationName(nomService,
                         nomLocalisation).size();
 
-        System.out.println("\n\nListe (nbre total) des Clients du service : " + nomService
-                + " "  + ticketService.getFileAttenteClientsByServiceName(nomService));
-        System.out.println("\n\nNombre de clients du service " + nomService + " : "
-                + nbreTotalServiceClients);
-
-        System.out.println("\n\nListe des Clients du service " + nomService + " a "
-                + nomLocalisation + " : " + ticketService
-                .getTicketsByServiceNameAndLocalisationName(nomService, nomLocalisation));
-        System.out.println("\n\nPosition dans la file d'attente: " + positionDansFile);
-        System.out.println("\n\nNombre de personnes devant: " + nombreDevant);
-
         // Create a new ticket
         Ticket ticket = new Ticket();
-        ticket.setNumero(generateTicketNumber());
+        ticket.setNumero(generateTicketNumber(nomService));
         ticket.setPositionDansFile(positionDansFile);
         ticket.setNombreDevant(nombreDevant);
         ticket.setService(service);
@@ -126,8 +105,8 @@ public class TicketController {
         // Retrieve the client
         Client client = clientService.getClientById(clientId);
         if (client == null) {
-            redirectAttributes.addFlashAttribute("error", "Client introuvable.");
-            return "redirect:/error";
+            model.addAttribute("error", "Client introuvable.");
+            return "error";
         }
         ticket.setClient(client);
 
@@ -145,14 +124,21 @@ public class TicketController {
 
 
     // Méthode pour générer un numéro de ticket unique
-    private int generateTicketNumber() {
-        // Logique pour générer un numéro unique, par exemple, en incrémentant le dernier numéro
-        return (int) (Math.random() * 10000); // obtenir un nombre aléatoire entre 0 et 9999
-
+    private String generateTicketNumber(String serviceName) {
+        /**
+         * Definition d'une politique de génération de numéro de ticket:
+         * 1. Génère un préfixe basé sur les trois premières lettres du service en majuscules.
+         * 2. Assure un compteur unique par service en commençant à 101.
+         * 3. Stocke les compteurs des services dans une Map<String, Integer>
+         *     pour suivre le dernier numéro attribué.
+         * Cela garantit que chaque service a son propre séquencement cohérent des tickets.
+         * Par exemple, le premier client du service Sonatel obtiendra le ticket SON101.
+         */
+        String servicePrefix = serviceName.substring(0, Math.min(3, serviceName.length())).toUpperCase();
+        int lastNumber = serviceCounters.getOrDefault(servicePrefix, START_NUMBER);
+        int newTicketNumber = lastNumber + 1;
+        serviceCounters.put(servicePrefix, newTicketNumber);
+        return servicePrefix + newTicketNumber;
     }
-
-
-
-
 
 }

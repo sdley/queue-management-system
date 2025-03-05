@@ -14,7 +14,7 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     // private String nomService; // nom du ticket
-    private int numero; // numero du ticket
+    private String numero; // numero du ticket
     private int positionDansFile;
     private int nombreDevant;
     private String status;
@@ -57,11 +57,11 @@ public class Ticket {
         this.service = service;
     }
 
-    public int getNumero() {
+    public String getNumero() {
         return numero;
     }
 
-    public void setNumero(int numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 

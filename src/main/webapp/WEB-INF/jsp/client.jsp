@@ -36,10 +36,6 @@
                 document.getElementById("hiddenNomLocalisation").value = value;
             }
         </script>
-
-<%--        <p>--%>
-<%--            <input type="submit" value="Generer un Ticket"/>--%>
-<%--        </p>--%>
     </form>
 
     <%--    Generation de ticket--%>
