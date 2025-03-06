@@ -67,5 +67,13 @@ public class TicketService {
                 .orElse(100);
     }
 
+    // Methode pour recuperer le ticket en court de traitement
+    public Ticket getTicketByServiceAndLocationAndStatus(String serviceName,
+                                                         String location,
+                                                         String status) {
+        return ticketRepository.findByServiceNomAndLocalisationAndStatus(
+                serviceName, location, status);
+    }
+
 
 }

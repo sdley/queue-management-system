@@ -40,10 +40,12 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                                               @Param("nomLocalisation") String nomLocalisation);
         */
 
-    // Interface pour recuperer le dernier ticket pour un service donné
+    // Methode pour recuperer le dernier ticket pour un service donné
     @Query(value = "SELECT * FROM ticket WHERE nom_service = " +
             "(SELECT nom FROM service WHERE nom = :serviceName) ORDER BY id DESC LIMIT 1",
             nativeQuery = true)
     Optional<Ticket> findLastTicketByService(@Param("serviceName") String serviceName);
 
+    // Methode pour recuperer le ticket en cours de traitement
+    Ticket findByServiceNomAndLocalisationAndStatus(String serviceName, String location, String status);
 }

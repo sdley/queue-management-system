@@ -44,6 +44,18 @@ public class TicketController {
             return "error";
         }
 
+        // Numero qui est entrain d'etre traite
+        Ticket ticketEnCours = ticketService
+                .getTicketByServiceAndLocationAndStatus(ticket.getService().getNom(),
+                        ticket.getLocalisation(), "En cours");
+
+        if (ticketEnCours == null){
+            model.addAttribute("numTicketEnCours",
+                    "Le service n'a pas encore demarré !");
+        } else {
+            model.addAttribute("numTicketEnCours", ticketEnCours.getNumero());
+        }
+
         model.addAttribute("ticket", ticket);
         return "ticketDetails";
     }
