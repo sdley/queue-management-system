@@ -1,5 +1,7 @@
 package sn.sdley.queueManagementSystem.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -47,5 +49,16 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     Optional<Ticket> findLastTicketByService(@Param("serviceName") String serviceName);
 
     // Methode pour recuperer le ticket en cours de traitement
-    Ticket findByServiceNomAndLocalisationAndStatus(String serviceName, String location, String status);
+    Ticket findByServiceNomAndLocalisationAndStatus(String serviceName,
+                                                    String location, String status);
+
+    Page<Ticket> findByServiceNomAndLocalisationAndStatusAndAgentIdOrderByIdAsc(String serviceNom,
+                                                                        String localisation,
+                                                                        String status,
+                                                                        Long agentId,
+                                                                        Pageable pageable);
+
+    Page<Ticket> findByServiceNomAndLocalisationAndStatusAndAgentIdAndPrevClientOrderByIdDesc(
+            String serviceName,String location, String status, Long agentId, boolean prevClient,
+            Pageable pageable);
 }

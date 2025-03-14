@@ -19,6 +19,8 @@ public class Ticket {
     private int nombreDevant;
     private String status;
     private String localisation;
+    private Long agentId;
+    private boolean prevClient = false;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
@@ -40,6 +42,23 @@ public class Ticket {
     }
 
     // Getters and Setters
+
+
+    public boolean isPrevClient() {
+        return prevClient;
+    }
+
+    public void setPrevClient(boolean prevClient) {
+        this.prevClient = prevClient;
+    }
+
+    public Long getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(Long agentId) {
+        this.agentId = agentId;
+    }
 
     public String getLocalisation() {
         return localisation;

@@ -1,6 +1,9 @@
 package sn.sdley.queueManagementSystem.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import sn.sdley.queueManagementSystem.model.Ticket;
 import sn.sdley.queueManagementSystem.repositories.TicketRepository;
@@ -35,6 +38,8 @@ public class TicketService {
             ticket.setStatus(ticketDetails.getStatus());
             ticket.setService(ticketDetails.getService());
             ticket.setClient(ticketDetails.getClient());
+            ticket.setAgentId(ticketDetails.getAgentId());
+            ticket.setPrevClient(ticketDetails.isPrevClient());
             return ticketRepository.save(ticket);
         }
         return null;
@@ -75,5 +80,45 @@ public class TicketService {
                 serviceName, location, status);
     }
 
+    public Ticket getTicketByServiceAndLocationAndStatusAndAgentId(
+            String serviceName, String location, String status, Long agentId
+    ) {
+        // Récupère uniquement le premier ticket de la liste
+        Pageable pageable = PageRequest.of(0, 1);
+
+        /**
+         * Au lieu de retourner directement une liste liste de Tickets comme ceci:
+         * return ticketRepository.findByServiceNomAndLocalisationAndStatusAndAgentId(
+         *                 serviceName, location, status, agentId, pageable
+         *         );
+         * Nous retournons un seul Ticket a la fois pour traitement!
+         */
+        Page<Ticket> tickets = ticketRepository
+                .findByServiceNomAndLocalisationAndStatusAndAgentIdOrderByIdAsc(
+                serviceName, location, status, agentId, pageable
+        );
+
+        return tickets.hasContent() ? tickets.getContent().get(0) : null;
+    }
+
+    // Methode pour recuperer le ticket du client precedent
+    public Ticket getTicketByServiceAndLocationAndStatusAndAgentIdAndPreClient(
+            String serviceName, String location, String status, Long agentId,
+            boolean prevClient ) {
+        /**
+         * Au lieu de retourner directement une liste liste de Tickets comme ceci:
+         * return ticketRepository.findByServiceNomAndLocalisationAndStatusAndAgentIdAndPrevClient(
+         *                 serviceName, location, status, agentId, prevClient
+         *         );
+         * Nous retournons un seul Ticket a la fois pour traitement!
+         */
+        // Récupère uniquement le premier ticket de la liste
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Ticket> tickets = ticketRepository
+                .findByServiceNomAndLocalisationAndStatusAndAgentIdAndPrevClientOrderByIdDesc(
+                        serviceName, location, status, agentId, prevClient, pageable
+                );
+        return tickets.hasContent() ? tickets.getContent().get(0) : null;
+    }
 
 }
