@@ -21,7 +21,7 @@
     </div>
 </form>
 <p>
-    <a href="${pageContext.request.contextPath}/admin">Retour à la liste des Admins</a>
+    <a href="${pageContext.request.contextPath}/admin">Retour a la liste des Admins</a>
 </p>
 </body>
 </html>

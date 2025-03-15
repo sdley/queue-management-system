@@ -5,10 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import sn.sdley.queueManagementSystem.dto.QueueInfo;
 import sn.sdley.queueManagementSystem.model.Ticket;
 import sn.sdley.queueManagementSystem.repositories.TicketRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
@@ -119,6 +121,18 @@ public class TicketService {
                         serviceName, location, status, agentId, prevClient, pageable
                 );
         return tickets.hasContent() ? tickets.getContent().get(0) : null;
+    }
+
+    // Method for admin dashboard
+    public List<QueueInfo> getQueuesOverview() {
+        List<Object[]> results = ticketRepository.getQueueSummary();
+
+        return results.stream().map(result -> new QueueInfo(
+                (String) result[0],  // Service Nom
+                (String) result[1],  // Localisation
+                ((Number) result[2]).intValue(), // Nombre de clients en attente
+                (result[3] != null) ? (String) result[3] : "Aucun" // Numéro du prochain ticket
+        )).collect(Collectors.toList());
     }
 
 }

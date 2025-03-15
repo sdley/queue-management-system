@@ -5,9 +5,13 @@ import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sn.sdley.queueManagementSystem.dto.QueueInfo;
 import sn.sdley.queueManagementSystem.model.Admin;
+import sn.sdley.queueManagementSystem.model.FileAttente;
 import sn.sdley.queueManagementSystem.service.AdminService;
 import sn.sdley.queueManagementSystem.service.FileAttenteService;
+import sn.sdley.queueManagementSystem.service.TicketService;
 
 import java.util.List;
 
@@ -19,23 +23,16 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+    @Autowired
+    private TicketService ticketService;
+
+    @Autowired
+    private FileAttenteService fileAttenteService;
+
     @GetMapping
     public String listAdmins(Model model) {
         List<Admin> admins = adminService.getAllAdmins();
-//        model.addAttribute("adminsList", admins);
-
-//            System.out.println("\nListe des admins [objet]: \n" + admins);
         model.addAttribute("admins", admins);
-
-//        System.out.println("id Admin : "+ admins.get(0).getId());
-
-        // print admins in the console using for each loop in json format
-//        for (Admin admin : admins) {
-//            System.out.println("id Admin : "+admin.getId());
-//            System.out.println("Nom Admin : "+admin.getNom());
-//            System.out.println("Prenom Admin : "+admin.getPrenom());
-//        }
-
 
         return "admin"; // retourne la vue admin.jsp correspondant a la liste des admins
     }
@@ -43,14 +40,14 @@ public class AdminController {
     @GetMapping("/add")
     public String newAdmin(Model model) {
         model.addAttribute("admin", new Admin());
-//        System.out.println("New admin: " + new Admin());
+
         return "add-admin"; // formulaire d'ajout d'un admin
     }
 
     @PostMapping("/add")
     public String addAdmin(@ModelAttribute Admin admin) {
         adminService.createAdmin(admin);
-//        System.out.println("New admin cree avec succes: " + admin);
+
         return "redirect:/admin"; // redirige vers la liste des admins
     }
 
@@ -72,4 +69,32 @@ public class AdminController {
         return "redirect:/admin"; // redirige vers la liste des admins
     }
 
+    @GetMapping("/dashboard")
+    public String getAdminDashboard(Model model) {
+        List<QueueInfo> queues = ticketService.getQueuesOverview();
+        model.addAttribute("queues", queues);
+        return "admin-dashboard";
+    }
+
+
+// Sélection d'un admin et redirection vers le dashboard
+//@PostMapping("/selectAdmin")
+//public String selectAdmin(@RequestParam("adminId") Long adminId,
+//                          RedirectAttributes redirectAttributes) {
+//
+//    redirectAttributes.addAttribute("adminId", adminId);
+//    return "redirect:/admin/dashboard";
+//}
+//
+//    // Dashboard affichant toutes les files d'attente
+//    @GetMapping("/dashboard")
+//    public String dashboard(@RequestParam("adminId") Long adminId, Model model) {
+//        // Récupérer les files d’attente en cours
+//        List<FileAttente> queues = fileAttenteService.getAllFilesAttente();
+//
+//        model.addAttribute("queues", queues);
+//        model.addAttribute("adminId", adminId);
+//
+//        return "admin-dashboard";
+//    }
 }

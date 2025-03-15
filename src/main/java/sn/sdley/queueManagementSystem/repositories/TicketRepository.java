@@ -61,4 +61,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     Page<Ticket> findByServiceNomAndLocalisationAndStatusAndAgentIdAndPrevClientOrderByIdDesc(
             String serviceName,String location, String status, Long agentId, boolean prevClient,
             Pageable pageable);
+
+    // method for admin dashboard
+    @Query("SELECT t.service.nom, t.localisation, COUNT(t), MIN(t.numero) " +
+            "FROM Ticket t WHERE t.status = 'En attente' " +
+            "GROUP BY t.service.nom, t.localisation")
+    List<Object[]> getQueueSummary();
 }
