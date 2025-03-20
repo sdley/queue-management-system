@@ -63,8 +63,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             Pageable pageable);
 
     // method for admin dashboard
-    @Query("SELECT t.service.nom, t.localisation, COUNT(t), MIN(t.numero) " +
-            "FROM Ticket t WHERE t.status = 'En attente' " +
-            "GROUP BY t.service.nom, t.localisation")
+    @Query("SELECT t.service.nom, t.localisation, COUNT(t), " +
+            "(SELECT t2.numero FROM Ticket t2 WHERE t2.status = 'En Attente' AND t2.service.nom = t.service.nom " +
+            "AND t2.localisation = t.localisation ORDER BY t2.id ASC LIMIT 1) " +
+            "FROM Ticket t WHERE t.status = 'En Attente' GROUP BY t.service.nom, t.localisation")
     List<Object[]> getQueueSummary();
+
+    @Query("SELECT t.numero FROM Ticket t WHERE t.status = 'En Cours' AND t.service.nom = :serviceNom " +
+            "AND t.localisation = :localisation ORDER BY t.id ASC LIMIT 1")
+    String getCurrentProcessingTicket(String serviceNom, String localisation);
+
 }

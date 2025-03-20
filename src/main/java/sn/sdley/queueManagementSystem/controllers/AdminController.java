@@ -77,24 +77,4 @@ public class AdminController {
     }
 
 
-// Sélection d'un admin et redirection vers le dashboard
-//@PostMapping("/selectAdmin")
-//public String selectAdmin(@RequestParam("adminId") Long adminId,
-//                          RedirectAttributes redirectAttributes) {
-//
-//    redirectAttributes.addAttribute("adminId", adminId);
-//    return "redirect:/admin/dashboard";
-//}
-//
-//    // Dashboard affichant toutes les files d'attente
-//    @GetMapping("/dashboard")
-//    public String dashboard(@RequestParam("adminId") Long adminId, Model model) {
-//        // Récupérer les files d’attente en cours
-//        List<FileAttente> queues = fileAttenteService.getAllFilesAttente();
-//
-//        model.addAttribute("queues", queues);
-//        model.addAttribute("adminId", adminId);
-//
-//        return "admin-dashboard";
-//    }
 }

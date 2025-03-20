@@ -127,12 +127,19 @@ public class TicketService {
     public List<QueueInfo> getQueuesOverview() {
         List<Object[]> results = ticketRepository.getQueueSummary();
 
-        return results.stream().map(result -> new QueueInfo(
-                (String) result[0],  // Service Nom
-                (String) result[1],  // Localisation
-                ((Number) result[2]).intValue(), // Nombre de clients en attente
-                (result[3] != null) ? (String) result[3] : "Aucun" // Numéro du prochain ticket
-        )).collect(Collectors.toList());
+        return results.stream().map(result -> {
+            String serviceNom = (String) result[0];
+            String localisation = (String) result[1];
+            int clientsEnAttente = ((Number) result[2]).intValue();
+            String numeroProchainTicket = (result[3] != null) ? (String) result[3] : "Aucun";
+
+            // Récupération du ticket en cours de traitement
+            String numeroTicketEnCours = ticketRepository
+                    .getCurrentProcessingTicket(serviceNom, localisation);
+
+            return new QueueInfo(serviceNom, localisation, clientsEnAttente,
+                    numeroProchainTicket, numeroTicketEnCours);
+        }).collect(Collectors.toList());
     }
 
 }
