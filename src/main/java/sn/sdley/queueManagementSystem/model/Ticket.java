@@ -20,7 +20,7 @@ public class Ticket {
     private String status;
     private String localisation;
     private Long agentId;
-    private boolean prevClient = false;
+    private boolean isPrevClient = false; // isPrevClient
 
     @ManyToOne
     @JoinColumn(name = "client_id")
@@ -45,11 +45,11 @@ public class Ticket {
 
 
     public boolean isPrevClient() {
-        return prevClient;
+        return isPrevClient;
     }
 
-    public void setPrevClient(boolean prevClient) {
-        this.prevClient = prevClient;
+    public void setIsPrevClient(boolean isPrevClient) {
+        this.isPrevClient = isPrevClient;
     }
 
     public Long getAgentId() {
