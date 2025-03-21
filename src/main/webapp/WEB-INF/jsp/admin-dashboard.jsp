@@ -53,10 +53,11 @@
                 <td>${queue.serviceNom}</td>
                 <td>${queue.localisation}</td>
                 <td>${queue.clientsEnAttente}</td>
-                <td><c:out value="${queue.ticketEnCours}" escapeXml="false"/></td>
+                <td>${queue.numeroTicketEnCours}</td>
                 <td>${queue.numeroProchainTicket}</td>
             </tr>
         </c:forEach>
+
         </tbody>
     </table>
 

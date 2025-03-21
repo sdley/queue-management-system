@@ -141,26 +141,13 @@ public class TicketService {
     public List<QueueInfo> getQueuesOverview() {
         List<Object[]> results = ticketRepository.getQueueSummary();
 
-        return results.stream().map(result -> {
-            String serviceNom = (String) result[0];
-            String localisation = (String) result[1];
-            int clientsEnAttente = ((Number) result[2]).intValue();
-
-            // Ticket en cours
-            String ticketEnCours = (result[3] != null) ? (String) result[3]
-                    : "<span class='service-non-demarre'>Service Non Démarré</span>";
-
-            // Prochain Ticket
-            String numeroProchainTicket = (result[4] != null) ? (String) result[4] : "Néant";
-
-            // Si la file est terminée (Clients en Attente == 0), mise à jour des valeurs
-            if (clientsEnAttente == 0) {
-                ticketEnCours = "<span style='color: green; font-weight: bold;'>File attente Terminée</span>";
-                numeroProchainTicket = "Néant";
-            }
-
-            return new QueueInfo(serviceNom, localisation, clientsEnAttente, ticketEnCours, numeroProchainTicket);
-        }).collect(Collectors.toList());
+        return results.stream().map(result -> new QueueInfo(
+                (String) result[0],  // Service Nom
+                (String) result[1],  // Localisation
+                ((Number) result[2]).intValue(), // Nombre de clients en attente
+                (result[3] != null) ? (String) result[3] : null, // Numéro du ticket en cours
+                (result[4] != null) ? (String) result[4] : null  // Numéro du prochain ticket
+        )).collect(Collectors.toList());
     }
 
 }
