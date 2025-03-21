@@ -1,30 +1,44 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Tableau de Bord Administrateur</title>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
     <style>
-        .container { width: 80%; margin: auto; margin-top: 50px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f4f4f4; }
-        .red { color: red; font-weight: bold; } /* ✅ Message en rouge */
-        .back-button {
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .red-text {
+            color: red;
+            font-weight: bold;
+        }
+        .green-text {
+            color: green;
+            font-weight: bold;
+        }
+
+        .service-non-demarre {
+             color: red;
+             font-weight: bold;
         }
     </style>
 </head>
 <body>
-<div class="container">
     <h1>Tableau de Bord de l'Administrateur</h1>
     <h2>Vue d'ensemble des Files d'Attente</h2>
-    <table>
+
+    <table border="1">
+        <thead>
         <tr>
             <th>Service</th>
             <th>Localisation</th>
@@ -32,44 +46,25 @@
             <th>Ticket en Cours</th>
             <th>Prochain Ticket</th>
         </tr>
+        </thead>
+        <tbody>
         <c:forEach var="queue" items="${queues}">
             <tr>
                 <td>${queue.serviceNom}</td>
                 <td>${queue.localisation}</td>
-                <td>
-                    <c:choose>
-                        <c:when test="${queue.clientsEnAttente > 0}">
-                            ${queue.clientsEnAttente}
-                        </c:when>
-                        <c:otherwise>
-                            <span class="red">File Attente Terminee</span> <!-- ✅ Message rouge -->
-                        </c:otherwise>
-                    </c:choose>
-                </td>
-                <td>
-                    <c:choose>
-                        <c:when test="${not empty queue.numeroTicketEnCours}">
-                            ${queue.numeroTicketEnCours}
-                        </c:when>
-                        <c:otherwise>
-                            <span class="red">Service Non Demarre</span> <!-- ✅ Message rouge -->
-                        </c:otherwise>
-                    </c:choose>
-                </td>
-                <td>
-                    <c:choose>
-                        <c:when test="${queue.numeroProchainTicket != 'Aucun'}">
-                            ${queue.numeroProchainTicket}
-                        </c:when>
-                        <c:otherwise>
-                            <span class="red">Aucun Ticket Disponible</span> <!-- ✅ Message rouge -->
-                        </c:otherwise>
-                    </c:choose>
-                </td>
+                <td>${queue.clientsEnAttente}</td>
+                <td><c:out value="${queue.ticketEnCours}" escapeXml="false"/></td>
+                <td>${queue.numeroProchainTicket}</td>
             </tr>
         </c:forEach>
+        </tbody>
     </table>
-    <a href="/admin" class="back-button">Retour</a>
-</div>
+
+    <p>
+        <button onclick="history.back()"
+                style="background-color: blue; color: white; padding: 10px;"
+        >Retour</button>
+    </p>
+
 </body>
 </html>

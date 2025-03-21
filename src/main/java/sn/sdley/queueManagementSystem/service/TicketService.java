@@ -145,14 +145,21 @@ public class TicketService {
             String serviceNom = (String) result[0];
             String localisation = (String) result[1];
             int clientsEnAttente = ((Number) result[2]).intValue();
-            String numeroProchainTicket = (result[3] != null) ? (String) result[3] : "Aucun";
 
-            // Récupération du ticket en cours de traitement
-            String numeroTicketEnCours = ticketRepository
-                    .getCurrentProcessingTicket(serviceNom, localisation);
+            // Ticket en cours
+            String ticketEnCours = (result[3] != null) ? (String) result[3]
+                    : "<span class='service-non-demarre'>Service Non Démarré</span>";
 
-            return new QueueInfo(serviceNom, localisation, clientsEnAttente,
-                    numeroProchainTicket, numeroTicketEnCours);
+            // Prochain Ticket
+            String numeroProchainTicket = (result[4] != null) ? (String) result[4] : "Néant";
+
+            // Si la file est terminée (Clients en Attente == 0), mise à jour des valeurs
+            if (clientsEnAttente == 0) {
+                ticketEnCours = "<span style='color: green; font-weight: bold;'>File attente Terminée</span>";
+                numeroProchainTicket = "Néant";
+            }
+
+            return new QueueInfo(serviceNom, localisation, clientsEnAttente, ticketEnCours, numeroProchainTicket);
         }).collect(Collectors.toList());
     }
 

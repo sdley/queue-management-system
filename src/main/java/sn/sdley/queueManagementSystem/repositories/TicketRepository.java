@@ -69,14 +69,22 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             Pageable pageable);
 
     // method for admin dashboard
-    @Query("SELECT t.service.nom, t.localisation, COUNT(t), " +
-            "(SELECT t2.numero FROM Ticket t2 WHERE t2.status = 'En Attente' AND t2.service.nom = t.service.nom " +
-            "AND t2.localisation = t.localisation ORDER BY t2.id ASC LIMIT 1) " +
-            "FROM Ticket t WHERE t.status = 'En Attente' GROUP BY t.service.nom, t.localisation")
+    /*
+        Cette requête SQL JPA permet de récupérer une vue d’ensemble des files d’attente
+        pour l'administrateur. Elle regroupe les tickets par service et localisation,
+        tout en fournissant les informations suivantes :
+            Le nombre de clients en attente 🕒
+            Le ticket actuellement en cours de traitement 🎫
+            Le prochain ticket en attente ⏭️
+     */
+    @Query("SELECT t.service.nom, t.localisation, " +
+            "COUNT(CASE WHEN t.status = 'En Attente' THEN 1 ELSE NULL END), " +
+            "(SELECT t2.numero FROM Ticket t2 WHERE t2.status = 'En Cours' AND t2.service.nom = t.service.nom " +
+            "AND t2.localisation = t.localisation ORDER BY t2.id ASC LIMIT 1), " +
+            "(SELECT t3.numero FROM Ticket t3 WHERE t3.status = 'En Attente' AND t3.service.nom = t.service.nom " +
+            "AND t3.localisation = t.localisation ORDER BY t3.id ASC LIMIT 1) " +
+            "FROM Ticket t " +
+            "GROUP BY t.service.nom, t.localisation")
     List<Object[]> getQueueSummary();
-
-    @Query("SELECT t.numero FROM Ticket t WHERE t.status = 'En Cours' AND t.service.nom = :serviceNom " +
-            "AND t.localisation = :localisation ORDER BY t.id ASC LIMIT 1")
-    String getCurrentProcessingTicket(String serviceNom, String localisation);
 
 }
