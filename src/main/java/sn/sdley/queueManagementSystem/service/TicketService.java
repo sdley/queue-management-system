@@ -41,7 +41,7 @@ public class TicketService {
             ticket.setService(ticketDetails.getService());
             ticket.setClient(ticketDetails.getClient());
             ticket.setAgentId(ticketDetails.getAgentId());
-            ticket.setPrevClient(ticketDetails.isPrevClient());
+            ticket.setIsPrevClient(ticketDetails.isPrevClient());
             return ticketRepository.save(ticket);
         }
         return null;
@@ -103,8 +103,22 @@ public class TicketService {
         return tickets.hasContent() ? tickets.getContent().get(0) : null;
     }
 
+    public Ticket getTicketByServiceAndLocationAndStatusAndAgentIdReverseOrder(
+            String serviceName, String location, String status, Long agentId
+    ) {
+        // Récupère uniquement le premier ticket de la liste
+        Pageable pageable = PageRequest.of(0, 1);
+
+        Page<Ticket> tickets = ticketRepository
+                .findByServiceNomAndLocalisationAndStatusAndAgentIdOrderByIdDesc(
+                        serviceName, location, status, agentId, pageable
+                );
+
+        return tickets.hasContent() ? tickets.getContent().get(0) : null;
+    }
+
     // Methode pour recuperer le ticket du client precedent
-    public Ticket getTicketByServiceAndLocationAndStatusAndAgentIdAndPreClient(
+    public Ticket getTicketByServiceAndLocationAndStatusAndAgentIdAndIsPrevClient(
             String serviceName, String location, String status, Long agentId,
             boolean prevClient ) {
         /**
@@ -117,7 +131,7 @@ public class TicketService {
         // Récupère uniquement le premier ticket de la liste
         Pageable pageable = PageRequest.of(0, 1);
         Page<Ticket> tickets = ticketRepository
-                .findByServiceNomAndLocalisationAndStatusAndAgentIdAndPrevClientOrderByIdDesc(
+                .findByServiceNomAndLocalisationAndStatusAndAgentIdAndIsPrevClientOrderByIdDesc(
                         serviceName, location, status, agentId, prevClient, pageable
                 );
         return tickets.hasContent() ? tickets.getContent().get(0) : null;

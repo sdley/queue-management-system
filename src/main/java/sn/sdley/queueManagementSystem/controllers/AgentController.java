@@ -161,7 +161,6 @@ public class AgentController {
         if (currentTicket != null) {
             // Le client doit attendre qu'on traite le precedent
             currentTicket.setStatus("En attente");
-            currentTicket.setPrevClient(false);
             // Un autre agent doit etre en mesure de traiter ce client
             // Donc on le libere en retirant l'ID de l'agent
             currentTicket.setAgentId(null);
@@ -170,7 +169,7 @@ public class AgentController {
 
         // On recupere le client precedent
         Ticket prevTicket = ticketService
-                .getTicketByServiceAndLocationAndStatusAndAgentIdAndPreClient(
+                .getTicketByServiceAndLocationAndStatusAndAgentIdAndIsPrevClient(
                         nomService, nomLocalisation, "Terminé", agentId, true
                 );
         if (prevTicket == null) {
@@ -184,8 +183,19 @@ public class AgentController {
 
         // If prevTicket, we update it!
         prevTicket.setStatus("En Cours");
-        prevTicket.setAgentId(agentId);
+        prevTicket.setIsPrevClient(false);
         ticketService.updateTicket(prevTicket.getId(), prevTicket);
+
+        // Now, we have to find the previous client for the current ticket
+        // In fact, it's previous of previous!
+        Ticket newPrevTicket = ticketService
+                .getTicketByServiceAndLocationAndStatusAndAgentIdReverseOrder(
+                        nomService, nomLocalisation, "Terminé", agentId
+                );
+        if (newPrevTicket != null) {
+            newPrevTicket.setIsPrevClient(true);
+            ticketService.updateTicket(newPrevTicket.getId(), newPrevTicket);
+        }
 
         // On renvoie le client correspondant
         currentClient = prevTicket.getClient();
@@ -214,9 +224,26 @@ public class AgentController {
                         nomService, nomLocalisation, "En Cours", agentId
                 );
 
+        // Ticket precedent
+        Ticket previousTicket = ticketService
+                .getTicketByServiceAndLocationAndStatusAndAgentIdAndIsPrevClient(
+                        nomService, nomLocalisation, "Terminé", agentId, true
+                );
+        /*
+            Si previousTicket existe, on le met à jour
+            Il n'est plus le client précédent
+            C'est plutot currentTicket qui est le client précédent
+            Et nextTicket devient le client en cours de traitement
+         */
+        if (previousTicket != null) {
+            previousTicket.setIsPrevClient(false);
+            ticketService.updateTicket(previousTicket.getId(), previousTicket);
+        }
+
+        // Maj du ticket en cours de traitement
         if (currentTicket != null) {
             currentTicket.setStatus("Terminé");
-            currentTicket.setPrevClient(true);
+            currentTicket.setIsPrevClient(true);
             ticketService.updateTicket(currentTicket.getId(), currentTicket);
         }
 

@@ -58,8 +58,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                                                                         Long agentId,
                                                                         Pageable pageable);
 
-    Page<Ticket> findByServiceNomAndLocalisationAndStatusAndAgentIdAndPrevClientOrderByIdDesc(
-            String serviceName,String location, String status, Long agentId, boolean prevClient,
+    Page<Ticket> findByServiceNomAndLocalisationAndStatusAndAgentIdOrderByIdDesc(String serviceNom,
+                                                                                String localisation,
+                                                                                String status,
+                                                                                Long agentId,
+                                                                                Pageable pageable);
+
+    Page<Ticket> findByServiceNomAndLocalisationAndStatusAndAgentIdAndIsPrevClientOrderByIdDesc(
+            String serviceName,String location, String status, Long agentId, boolean isPrevClient,
             Pageable pageable);
 
     // method for admin dashboard
