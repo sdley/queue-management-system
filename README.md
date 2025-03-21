@@ -58,6 +58,38 @@ fig: relations existantes entre les differentes classes
 
 NB: *Ces diagrammes peuvent etre détaillés davantage en fonction des besoins.*
 
+## Presentation de l'application
+### Premiere version simplifiee
+- Technologies:
+  - Frontend: Java Server Pages (JSP), CSS
+  - Backend: Spring Boot, MySQL, Spring Data JPA, Hibernate
+- UI: 
+  - Page d'accueil
+  ![img_1.png](img_1.png)
+  fig: page d'accueil
+  - Client
+  ![img_2.png](img_2.png)
+  fig: choix service
+  ![img_3.png](img_3.png)
+  fig: generation de Ticket
+  
+  - Agent
+  ![img_4.png](img_4.png)
+  fig: Choix service et localisation
+  ![img_5.png](img_5.png)
+  fig: [connexion agent]
+  ![img_6.png](img_6.png)
+  fig: appel client *(cas 1)**
+  ![img_7.png](img_7.png)
+  fig: appel precedent/suivant [Aucun client en attente] *(cas 2)**
+
+  - Page admin
+  ![img_8.png](img_8.png)
+  fig: dashboard admin - file du client SON106 *(cas 1)**
+  ![img_9.png](img_9.png)
+  fig: admin dashboard - file attente Terminee a la Sonatel Cite Keur Gorgui *(cas 2)**
+  
+
 ## Copyright ©️
 - [sdley Souleymane DIALLO](https://sdley.github.io/) 2025
 - UAM, Polytech Diamniadio
