@@ -1,5 +1,6 @@
 package sn.sdley.queueManagementSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ public class Service {
     private String description;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Localisation> localisations;
 
     /**
@@ -21,6 +23,7 @@ public class Service {
      * (ici, List<Ticket> tickets), il doit être supprimé de la base de données automatiquement.
      */
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Ticket> tickets;
 
     public List<Ticket> getTickets() {
