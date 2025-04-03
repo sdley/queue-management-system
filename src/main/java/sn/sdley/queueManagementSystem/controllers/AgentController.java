@@ -1,280 +1,156 @@
 package sn.sdley.queueManagementSystem.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sn.sdley.queueManagementSystem.model.*;
 import sn.sdley.queueManagementSystem.service.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/agent")
+@RestController
+@RequestMapping("/api/agents")
 public class AgentController {
 
     @Autowired
     private AgentService agentService;
-
     @Autowired
     private ClientService clientService;
-
     @Autowired
     private ServiceService serviceService;
-
     @Autowired
     private LocalisationService localisationService;
-
     @Autowired
     private TicketService ticketService;
 
-    private int currentIndex = 0;
-
+    // Get all agents
     @GetMapping
-    public String agentsPage(Model model) {
-        List<Agent> agents = agentService.getAllAgents();
-
-        model.addAttribute("agents", agents);
-        model.addAttribute("services", serviceService.getAllServices());
-
-        return "agent";
+    public ResponseEntity<List<Agent>> getAllAgents() {
+        return ResponseEntity.ok(agentService.getAllAgents());
     }
 
-    @GetMapping("/add")
-    public String addAgent(Model model) {
-        model.addAttribute("agent", new Agent());
-        return "add-agent"; // Retourne agent.jsp contient egalement le formulaire d'ajout
+    // Create a new agent
+    @PostMapping
+    public ResponseEntity<Agent> createAgent(@RequestBody Agent agent) {
+        Agent savedAgent = agentService.createAgent(agent);
+        return ResponseEntity.ok(savedAgent);
     }
 
-    @PostMapping("/add")
-    public String addAgent(@ModelAttribute Agent agent) {
-        agentService.createAgent(agent);
-        return "redirect:/agent"; // Redirige vers la liste des agents
+    // Get localisations by service name
+    @GetMapping("/services/{nomService}/localisations")
+    public ResponseEntity<List<Localisation>> getLocalisations(@PathVariable String nomService) {
+        Service service = serviceService.getServiceByName(nomService);
+        if (service == null) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(localisationService.getLocalisationsByService(service));
     }
 
-    // choix service
-    @PostMapping("/choixService")
-    public String chooseService(@RequestParam String serviceId, Model model) {
-        // Retrieve all services
-        List<Service> services = serviceService.getAllServices();
-        model.addAttribute("services", services);
-
-        // Find the selected service based on the serviceId
-        Service selectedService = serviceService.getServiceByName(serviceId);
-
-        // Fetch localisations based on the selected service
-        List<Localisation> localisations = localisationService
-                .getLocalisationsByService(selectedService);
-        model.addAttribute("localisations", localisations);
-
-        // Set selected service for display
-        model.addAttribute("selectedService", serviceId);
-
-        // Retrieve all clients
-        model.addAttribute("agents", agentService.getAllAgents());
-        return "agent"; // Return to the same JSP page
-    }
-
-    // Agent details page - gestion clients
-    @GetMapping("/agentDetails")
-    public String getAgentDetails(
-            @RequestParam("agentId") Long agentId,
-            @RequestParam("nomService") String nomService,
-            @RequestParam("nomLocalisation") String nomLocalisation,
-            @RequestParam(value = "currentClient", required = false) Client currentClient,
-            @RequestParam(value = "currentTicket", required = false) Ticket currentTicket,
-            @RequestParam(value = "errorMessage", required = false) String errorMessage,
-            Model model) {
-
-        // Fetch data on DB
+    // Get agent dashboard info (client en cours + ticket)
+    @GetMapping("/{agentId}/dashboard")
+    public ResponseEntity<?> getAgentDashboard(@PathVariable Long agentId,
+                                               @RequestParam String nomService,
+                                               @RequestParam String nomLocalisation) {
         Agent agent = agentService.getAgentById(agentId);
         Service service = serviceService.getServiceByName(nomService);
 
-        model.addAttribute("agent", agent);
-        model.addAttribute("service", service);
-        model.addAttribute("localisation", nomLocalisation);
-
-        if (currentClient != null) {
-            model.addAttribute("currentClient", currentClient);
+        if (agent == null || service == null) {
+            return ResponseEntity.badRequest().body("Agent ou service introuvable.");
         }
 
-        if (currentTicket != null) {
-            model.addAttribute("currentTicket", currentTicket);
-        }
+        Ticket currentTicket = ticketService.getTicketByServiceAndLocationAndStatusAndAgentId(
+                nomService, nomLocalisation, "En Cours", agentId
+        );
 
-        if (errorMessage != null && !errorMessage.isEmpty()) {
-            model.addAttribute("errorMessage", errorMessage);
-        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("agent", agent);
+        response.put("service", service);
+        response.put("localisation", nomLocalisation);
+        response.put("currentTicket", currentTicket);
+        response.put("currentClient", currentTicket != null ? currentTicket.getClient() : null);
 
-
-        // return agentDetails page
-        return "agentDetails";
+        return ResponseEntity.ok(response);
     }
 
-    // Generation de Ticket
-    @PostMapping("/traitementClient")
-    public String genererTicket(@RequestParam String nomService,
-                                @RequestParam Long agentId,
-                                @RequestParam String nomLocalisation,
-                                RedirectAttributes redirectAttributes,
-                                Model model) {
-        // Retrieve the service
-        Service service = serviceService.getServiceByName(nomService);
-        if (service == null) {
-            model.addAttribute("error", "Service introuvable.");
-            return "error";
+    // Appel client suivant
+    @PostMapping("/{agentId}/next")
+    public ResponseEntity<?> getNextClient(@PathVariable Long agentId,
+                                           @RequestParam String nomService,
+                                           @RequestParam String nomLocalisation) {
+
+        Ticket current = ticketService.getTicketByServiceAndLocationAndStatusAndAgentId(
+                nomService, nomLocalisation, "En Cours", agentId
+        );
+        Ticket previous = ticketService.getTicketByServiceAndLocationAndStatusAndAgentIdAndIsPrevClient(
+                nomService, nomLocalisation, "Terminé", agentId, true
+        );
+
+        if (previous != null) {
+            previous.setIsPrevClient(false);
+            ticketService.updateTicket(previous.getId(), previous);
         }
 
-        if (nomLocalisation == null || nomLocalisation.trim().isEmpty()) {
-            model.addAttribute("error",
-                    "Veuillez sélectionner une localisation");
-            return "error";
+        if (current != null) {
+            current.setStatus("Terminé");
+            current.setIsPrevClient(true);
+            ticketService.updateTicket(current.getId(), current);
         }
 
-        if (agentId == null) {
-            model.addAttribute("error",
-                    "Veuillez sélectionner un agent");
-            return "error";
+        Ticket next = ticketService.getTicketByServiceAndLocationAndStatusAndAgentId(
+                nomService, nomLocalisation, "En attente", null
+        );
+
+        if (next == null) {
+            return ResponseEntity.ok(Map.of("message", "Aucun client en attente."));
         }
 
-        // Redirect to agent details page
-        redirectAttributes.addAttribute("nomService", service.getNom());
-        redirectAttributes.addAttribute("nomLocalisation", nomLocalisation);
-        redirectAttributes.addAttribute("agentId", agentId);
-        return "redirect:/agent/agentDetails";
+        next.setStatus("En Cours");
+        next.setAgentId(agentId);
+        ticketService.updateTicket(next.getId(), next);
+
+        return ResponseEntity.ok(Map.of(
+                "ticket", next,
+                "client", next.getClient()
+        ));
     }
 
-    // Récupérer le client précédent
-    @PostMapping("/previousClient")
-    public String getPreviousClient(@RequestParam("serviceId") String nomService,
-                                    @RequestParam String nomLocalisation,
-                                    @RequestParam Long agentId,
-                                    RedirectAttributes redirectAttributes) {
-        Client currentClient;
+    // Revenir au client précédent
+    @PostMapping("/{agentId}/previous")
+    public ResponseEntity<?> getPreviousClient(@PathVariable Long agentId,
+                                               @RequestParam String nomService,
+                                               @RequestParam String nomLocalisation) {
 
-        // Ticket en cours de Traitement
-        Ticket currentTicket = ticketService
-                .getTicketByServiceAndLocationAndStatusAndAgentId(
-                        nomService, nomLocalisation, "En Cours", agentId
-                );
-        if (currentTicket != null) {
-            // Le client doit attendre qu'on traite le precedent
-            currentTicket.setStatus("En attente");
-            // Un autre agent doit etre en mesure de traiter ce client
-            // Donc on le libere en retirant l'ID de l'agent
-            currentTicket.setAgentId(null);
-            ticketService.updateTicket(currentTicket.getId(), currentTicket);
+        Ticket current = ticketService.getTicketByServiceAndLocationAndStatusAndAgentId(
+                nomService, nomLocalisation, "En Cours", agentId
+        );
+        if (current != null) {
+            current.setStatus("En attente");
+            current.setAgentId(null);
+            ticketService.updateTicket(current.getId(), current);
         }
 
-        // On recupere le client precedent
-        Ticket prevTicket = ticketService
-                .getTicketByServiceAndLocationAndStatusAndAgentIdAndIsPrevClient(
-                        nomService, nomLocalisation, "Terminé", agentId, true
-                );
-        if (prevTicket == null) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Il n'y a pas/plus de client precedent.");
-            redirectAttributes.addAttribute("nomService", nomService);
-            redirectAttributes.addAttribute("nomLocalisation", nomLocalisation);
-            redirectAttributes.addAttribute("agentId", agentId);
-            return "redirect:/agent/agentDetails";
+        Ticket prev = ticketService.getTicketByServiceAndLocationAndStatusAndAgentIdAndIsPrevClient(
+                nomService, nomLocalisation, "Terminé", agentId, true
+        );
+        if (prev == null) {
+            return ResponseEntity.ok(Map.of("message", "Aucun client précédent."));
         }
 
-        // If prevTicket, we update it!
-        prevTicket.setStatus("En Cours");
-        prevTicket.setIsPrevClient(false);
-        ticketService.updateTicket(prevTicket.getId(), prevTicket);
+        prev.setStatus("En Cours");
+        prev.setIsPrevClient(false);
+        ticketService.updateTicket(prev.getId(), prev);
 
-        // Now, we have to find the previous client for the current ticket
-        // In fact, it's previous of previous!
-        Ticket newPrevTicket = ticketService
-                .getTicketByServiceAndLocationAndStatusAndAgentIdReverseOrder(
-                        nomService, nomLocalisation, "Terminé", agentId
-                );
-        if (newPrevTicket != null) {
-            newPrevTicket.setIsPrevClient(true);
-            ticketService.updateTicket(newPrevTicket.getId(), newPrevTicket);
+        Ticket beforePrev = ticketService.getTicketByServiceAndLocationAndStatusAndAgentIdReverseOrder(
+                nomService, nomLocalisation, "Terminé", agentId
+        );
+        if (beforePrev != null) {
+            beforePrev.setIsPrevClient(true);
+            ticketService.updateTicket(beforePrev.getId(), beforePrev);
         }
 
-        // On renvoie le client correspondant
-        currentClient = prevTicket.getClient();
-
-        redirectAttributes.addAttribute("currentTicket", prevTicket);
-        redirectAttributes.addAttribute("currentClient", currentClient);
-        redirectAttributes.addAttribute("nomService", nomService);
-        redirectAttributes.addAttribute("nomLocalisation", nomLocalisation);
-        redirectAttributes.addAttribute("agentId", agentId);
-
-        return "redirect:/agent/agentDetails";
-    }
-
-    // Récupérer le client suivant
-    @PostMapping("/nextClient")
-    public String getNextClient(@RequestParam("serviceId") String nomService,
-                                @RequestParam String nomLocalisation,
-                                @RequestParam Long agentId,
-                                RedirectAttributes redirectAttributes) {
-
-        Client currentClient;
-
-        // Ticket en cours de Traitement
-        Ticket currentTicket = ticketService
-                .getTicketByServiceAndLocationAndStatusAndAgentId(
-                        nomService, nomLocalisation, "En Cours", agentId
-                );
-
-        // Ticket precedent
-        Ticket previousTicket = ticketService
-                .getTicketByServiceAndLocationAndStatusAndAgentIdAndIsPrevClient(
-                        nomService, nomLocalisation, "Terminé", agentId, true
-                );
-        /*
-            Si previousTicket existe, on le met à jour
-            Il n'est plus le client précédent
-            C'est plutot currentTicket qui est le client précédent
-            Et nextTicket devient le client en cours de traitement
-         */
-        if (previousTicket != null) {
-            previousTicket.setIsPrevClient(false);
-            ticketService.updateTicket(previousTicket.getId(), previousTicket);
-        }
-
-        // Maj du ticket en cours de traitement
-        if (currentTicket != null) {
-            currentTicket.setStatus("Terminé");
-            currentTicket.setIsPrevClient(true);
-            ticketService.updateTicket(currentTicket.getId(), currentTicket);
-        }
-
-        // Client suivant / ticket suivant
-        Ticket nextTicket = ticketService
-                .getTicketByServiceAndLocationAndStatusAndAgentId(
-                        nomService, nomLocalisation, "En attente", null
-                );
-        if (nextTicket == null) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "Aucun client en attente.");
-            redirectAttributes.addAttribute("nomService", nomService);
-            redirectAttributes.addAttribute("nomLocalisation", nomLocalisation);
-            redirectAttributes.addAttribute("agentId", agentId);
-            return "redirect:/agent/agentDetails";
-        }
-
-        // If nextTicket, we update it!
-        nextTicket.setStatus("En Cours");
-        nextTicket.setAgentId(agentId);
-        ticketService.updateTicket(nextTicket.getId(), nextTicket);
-
-        // On renvoie le client correspondant
-        currentClient = nextTicket.getClient();
-
-        redirectAttributes.addAttribute("currentTicket", nextTicket);
-        redirectAttributes.addAttribute("currentClient", currentClient);
-        redirectAttributes.addAttribute("nomService", nomService);
-        redirectAttributes.addAttribute("nomLocalisation", nomLocalisation);
-        redirectAttributes.addAttribute("agentId", agentId);
-
-        return "redirect:/agent/agentDetails";
+        return ResponseEntity.ok(Map.of(
+                "ticket", prev,
+                "client", prev.getClient()
+        ));
     }
 }
