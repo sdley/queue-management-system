@@ -1,6 +1,7 @@
 package sn.sdley.queueManagementSystem.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -28,6 +29,7 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "nomService") // nom_service est le nom de la colonne dans la table ticket
+    @JsonBackReference
     private Service service;
 
     public Ticket() {

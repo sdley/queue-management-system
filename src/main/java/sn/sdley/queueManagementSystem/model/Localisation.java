@@ -1,5 +1,6 @@
 package sn.sdley.queueManagementSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,6 +14,7 @@ public class Localisation {
 
     @ManyToOne
     @JoinColumn(name = "nom_service") // nom du service nom_service ou service_id
+    @JsonBackReference
     private Service service;
 
     public Localisation() {
