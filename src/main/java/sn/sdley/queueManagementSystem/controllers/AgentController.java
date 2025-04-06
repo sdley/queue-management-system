@@ -46,6 +46,17 @@ public class AgentController {
         return ResponseEntity.ok(localisationService.getLocalisationsByService(service));
     }
 
+    // Get agent by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Agent> getAgentById(@PathVariable Long id) {
+        Agent agent = agentService.getAgentById(id);
+        if (agent != null) {
+            return ResponseEntity.ok(agent);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     // Get agent dashboard info (client en cours + ticket)
     @GetMapping("/{agentId}/dashboard")
     public ResponseEntity<?> getAgentDashboard(@PathVariable Long agentId,
