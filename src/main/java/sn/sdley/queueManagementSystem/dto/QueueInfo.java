@@ -45,10 +45,10 @@ public class QueueInfo {
             return ticketEnCours;
         } else if (clientsEnAttente == 0) {
             // Aucun client en attente et aucun ticket en cours => File terminée
-            return "<span style='color:green; font-weight:bold;'>File attente Terminée</span>";
+            return "<span style='color:#00a8e2; font-weight:bold;'>File attente Terminée</span>";
         } else {
             // Aucun ticket en cours, clients en attente => Service Non Démarré
-            return "<span style='color:red; font-weight:bold;'>Service Non Démarré</span>";
+            return "<span style='color:#b26148; font-weight:bold;'>Service Non Démarré</span>";
         }
     }
 
@@ -57,9 +57,9 @@ public class QueueInfo {
     private String formatProchainTicket(String prochainTicket, int clientsEnAttente,
                                         String numeroTicketEnCours) {
         if (clientsEnAttente == 0 && numeroTicketEnCours != null) {
-            return "<span style='color:green; font-weight:bold;'>Néant</span>";
+            return "<span style='color:#00a8e2; font-weight:bold;'>Néant</span>";
         } else if (clientsEnAttente == 0 && numeroTicketEnCours == null) {
-            return "<span style='color:green; font-weight:bold;'>File attente Terminée</span>";
+            return "<span style='color:#00a8e2; font-weight:bold;'>File attente Terminée</span>";
 
         }
         return prochainTicket;
