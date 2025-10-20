@@ -72,5 +72,5 @@ MIT License, © [sdley Souleymane DIALLO](https://sdley.github.io/) 2025
 - Thanks to all contributors and the open-source community enthusuasts.
 
 ## Contact
-For questions or support, reach out via [GitHub Issues]() or contact [sdley Souleymane DIALLO](https://sdley.github.io/).
+For questions or support, reach out via [GitHub Issues](https://github.com/sdley/queue-management-system/issues) or contact [sdley Souleymane DIALLO](https://sdley.github.io/).
 
