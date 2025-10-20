@@ -1,86 +1,76 @@
-# Queue Managment System / Systeme de Gestion de file d'attente
+# Queue Management System
 
-## Presentation du cahier des charges
-- Concevoir et réaliser une application de gestion de file d’attente.
-- Lorsqu’on arrive sur le portail, on sélectionne le service(Seneau,
-Orange, Senelec, Bank …)
-- Une fois le service sélectionné, on choisit la localisation à partir
-d’une liste alimentée depuis le backoffice de l’application.
-- Le choix de la localisation du service redirige directement vers
-une page montrant
-  - Son numéro d’e-ticket (ex: votre numéro de ticket est 445)
-  - Sa position dans la file (ex: vous êtes à la 19 ème position)
-  - Le nombre de personnes devant
-  - Le numéro qui est en train d’être traité
-- A chaque appel d’un agent (qui dispose d’une interface où il peut
-voir le numéro en cours, cliquer sur “client suivant” / “client
-précédent” , le compteur du numéro en cours de traitement est
-incrémenté.
-- L’accès au backoffice par un admin doit permettre d’avoir une vue
-globale sur l’ensemble des files en cours et le numéro de chaque
-file
+Design and implementation of a web application for queue management.
 
-Passons a la conception du système 
-## Conception
-### Presentation des Acteurs du systeme
-- client: beneficiaire de services
-- agent: gestionnaire/prestataire des services
-- admin: administrateur global/superviseur
-### Evaluation des Besoins fonctionnels
-- selection service
-- choisir localisation
-- appel precedent/suivant (*par un agent*)
-- vue files d'attentes en cours (avec le numero de chaque file)
+## Project Overview
+This system allows users to select a service (e.g., utilities, banking), choose a location, and track their position in a service queue. The platform displays:
+- E-ticket number
+- User's position in the queue
+- Number of people ahead
+- Current ticket being served
 
-### Modelisation UML (Unified Modeling Language)
-### Diagramme de cas d'utilisation
+Agents manage queues via an interface (e.g., move to next/previous client), and administrators access a backoffice dashboard to monitor all ongoing queues.
+
+## System Architecture
+
+### Actors
+- **Client:** Beneficiary requesting services
+- **Agent:** Service provider managing clients
+- **Admin:** Administrator overseeing all queues
+- ### Use Case Diagram
 ![image](https://github.com/user-attachments/assets/c379db42-a53c-4f9c-98ba-b1769a4364c7)
 
-fig: diagramme de cas d'utilisation
+fig: use case diagram
 
-### Diagramme de classe
-Les principales classes du systeme sont: 
-- Personne
+### Functional Requirements
+- Select service
+- Choose location
+- Agents call next/previous client
+- View ongoing queues and current ticket numbers
+
+### Main Classes
+- Person
 - Client
 - Agent
 - Admin
 - Service
-- FileAttente
-- Localisation.
+- Queue (FileAttente)
+- Location
 
-Representons les interactions ou relations existantes entre ces differentes classes:
-- Un Service peut avoir plusieurs Localisations.
-- Une FileAttente est associée à un seul Service mais peut contenir plusieurs Clients.
-- Un Agent peut traiter des clients dans une file d'attente.
-- Un Admin peut voir toutes les files d'attente en cours.
+#### Key Relationships
+- A Service can have multiple Locations.
+- A Queue is linked to one Service but can contain multiple Clients.
+- Agents serve clients in a queue.
+- Admins have a global view over all queues.
+
 ![conception-image-diagram](img.png)
-fig: relations existantes entre les differentes classes
-
-NB: *Ces diagrammes peuvent etre détaillés davantage en fonction des besoins.*
-
-## Presentation de l'application
-### Premiere version simplifiee
-- Technologies:
-  - Frontend: Java Server Pages (JSP), CSS
-  - Backend: Spring Boot, MySQL, Spring Data JPA, Hibernate, 
-- UI: 
-  - Voir README.md du repos : [`queue-management-system`](https://github.com/sdley/queueManagementSystem)
-
-### Seconde version
-- Technologies:
-  - Frontend: Next.js 15, Tailwind CSS
-  - Backend: Spring Boot, MySQL, Spring Data JPA, Hibernate, RESTful API
-- UI:
-  - En cours de developpement
-  - Lien du repos : [`queue-management-system-ui`](https://github.com/sdley/queue-management-system-ui)
+fig: relationships between main classes
 
 
-## Copyright ©️
-- [sdley Souleymane DIALLO](https://sdley.github.io/) 2025
-- UAM, Polytech Diamniadio
+### Technology Stack
+- **Frontend :** Next.js 15, Tailwind CSS
+  - UI: [`queue-management-system-ui`](https://github.com/sdley/queue-management-system-ui)
+- **Backend:** Spring Boot, MySQL, Spring Data JPA, Hibernate, RESTful API
 
-  
+## Getting Started
+1. Clone this repository.
+2. Install required dependencies: Java, Maven, MySQL.
+3. Run the project using `mvn spring-boot:run`.
+4. Access via `localhost:8080`.
+
+## Contributing
+- Read `CONTRIBUTING.md` for contribution guidelines.
+- To participate in Hacktoberfest, look for issues tagged with `hacktoberfest` or `good first issue`.
+- Please adhere to the `CODE_OF_CONDUCT.md`.
+
+## License
+MIT License, © [sdley Souleymane DIALLO](https://sdley.github.io/) 2025
 
 
+## Acknowledgements
+- Inspired by real-world queue management needs.
+- Thanks to all contributors and the open-source community enthusuasts.
 
+## Contact
+For questions or support, reach out via [GitHub Issues]() or contact [sdley Souleymane DIALLO](https://sdley.github.io/).
 
