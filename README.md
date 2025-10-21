@@ -54,9 +54,11 @@ fig: relationships between main classes
 
 ## Getting Started
 1. Clone this repository.
-2. Install required dependencies: Java, Maven, MySQL.
-3. Run the project using `mvn spring-boot:run`.
-4. Access via `localhost:8080`.
+2. Install required dependencies: Java, Maven, MySQL (MariaDB).
+3. Run `docker-compose up -d mariadb` to start the MariaDB container.
+4. Run `CREATE DATABASE IF NOT EXISTS queueManagementDB;` in MariaDB before starting the project.
+5. Run the project using `mvn spring-boot:run`.
+6. Access via `localhost:8080`.
 
 ## Contributing
 - Read `CONTRIBUTING.md` for contribution guidelines.
